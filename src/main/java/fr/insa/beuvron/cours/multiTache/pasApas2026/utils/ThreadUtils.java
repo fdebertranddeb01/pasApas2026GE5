@@ -9,13 +9,22 @@ package fr.insa.beuvron.cours.multiTache.pasApas2026.utils;
  * @author fdebertranddeb01
  */
 public class ThreadUtils {
-    
+
     public static void joinSansInterruption(Thread t) {
         try {
             t.join();
         } catch (InterruptedException ex) {
-            throw new Error("interruption non attendue",ex);
+            throw new Error("interruption non attendue", ex);
         }
     }
-    
+
+    public static void sleepAlea(long duree) {
+        long de = (long) (duree * (0.5 + Math.random()));
+        try {
+            Thread.sleep(de);
+        } catch (InterruptedException ex) {
+            throw new Error("interruption non attendue");
+        }
+    }
+
 }
