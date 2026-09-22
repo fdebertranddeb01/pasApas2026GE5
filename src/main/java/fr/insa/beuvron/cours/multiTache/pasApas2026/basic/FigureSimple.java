@@ -5,14 +5,16 @@
 package fr.insa.beuvron.cours.multiTache.pasApas2026.basic;
 
 /**
- *
+ * test commit
  * @author fdebertranddeb01
  */
-public abstract class FigureSimple {
+public abstract class FigureSimple implements Figure{
     
-    public abstract double minX() ;
+    private int couleur;
+    
     public abstract double maxX();
     
+    @Override
     public double largeur(){
         return this.maxX() - this.minX();
     }

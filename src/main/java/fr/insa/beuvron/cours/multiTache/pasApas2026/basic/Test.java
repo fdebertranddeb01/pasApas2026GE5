@@ -11,7 +11,23 @@ package fr.insa.beuvron.cours.multiTache.pasApas2026.basic;
 public class Test {
     
     public static void main(String[] args) {
-        Pair1.affPair(5);
+        // Pair1.affPair(5);
+        
+        int truc = 3;
+        Figure f1 = new Figure(){
+            @Override
+            public double minX() {
+                System.out.println("truc = " + truc);
+                return 0;
+            }
+
+            @Override
+            public double largeur() {
+                return 0;
+            }
+            
+        };
+        f1.minX();
     }
     
 }
