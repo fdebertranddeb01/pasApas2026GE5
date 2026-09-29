@@ -18,7 +18,7 @@ public class ThreadUtils {
         }
     }
 
-    public static void sleepAlea(long duree) {
+     public static void sleepAlea(long duree) {
         long de = (long) (duree * (0.5 + Math.random()));
         try {
             Thread.sleep(de);
