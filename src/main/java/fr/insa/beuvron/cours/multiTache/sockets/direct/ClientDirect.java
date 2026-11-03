@@ -20,15 +20,18 @@ package fr.insa.beuvron.cours.multiTache.sockets.direct;
 
 import fr.insa.beuvron.utils.ConsoleFdB;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
 /**
  *
  * @author francois
  */
 public class ClientDirect {
-    
-    public static void direct () {
+
+    public static void direct() {
         try {
             String adrS = ConsoleFdB.entreeString("adresse serveur : ");
             int port = ConsoleFdB.entreeInt("port : ");
@@ -36,14 +39,23 @@ public class ClientDirect {
             System.out.println("adr serveur : " + soc.getInetAddress().getHostAddress());
             System.out.println("port serveur : " + soc.getPort());
             System.out.println("port local : " + soc.getLocalPort());
+            try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+                    soc.getOutputStream(), Charset.forName("UTF8")))) {
+                String mess = "";
+                while (!mess.equalsIgnoreCase("FIN")) {
+                    mess = ConsoleFdB.entreeString("votre message : ");
+                    out.println(mess);
+                    out.flush();
+                }
+            }
         } catch (IOException ex) {
             throw new Error(ex);
         }
-        
+
     }
-    
+
     public static void main(String[] args) {
-        System.out.println("TODO");
+        direct();
     }
-    
+
 }
