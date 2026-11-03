@@ -18,14 +18,50 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.sockets.direct;
 
+import fr.insa.beuvron.cours.multiTache.sockets.INetAdressUtil;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.Charset;
+
 /**
  *
  * @author francois
  */
 public class ServeurDirect {
-    
-    public static void main(String[] args) {
-        System.out.println("TODO");
+
+    public static final int PORT = 50001;
+
+    public static void direct() {
+        try {
+            ServerSocket serv = new ServerSocket(PORT);
+            var adrS = INetAdressUtil.premiereAdresseNonLoopback();
+            System.out.println("Serveur attends connection");
+            System.out.println("adresse : " + adrS.getHostAddress());
+            System.out.println("port : " + PORT);
+            Socket soc = serv.accept();
+            System.out.println("connection : ");
+            System.out.println("adr client : " + soc.getInetAddress().getHostAddress());
+            System.out.println("port client : " + soc.getPort());
+            System.out.println("port local : " + soc.getLocalPort());
+            try (var in = new BufferedReader(
+                    new InputStreamReader(
+                            soc.getInputStream(), Charset.forName("UTF8")))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    System.out.println("recu : " + line);
+                }
+            }
+        } catch (IOException ex) {
+            throw new Error(ex);
+        }
+
     }
-    
+
+    public static void main(String[] args) {
+        direct();
+    }
+
 }

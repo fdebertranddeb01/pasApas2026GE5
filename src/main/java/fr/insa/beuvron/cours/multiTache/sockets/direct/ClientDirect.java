@@ -18,11 +18,29 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.sockets.direct;
 
+import fr.insa.beuvron.utils.ConsoleFdB;
+import java.io.IOException;
+import java.net.Socket;
+
 /**
  *
  * @author francois
  */
 public class ClientDirect {
+    
+    public static void direct () {
+        try {
+            String adrS = ConsoleFdB.entreeString("adresse serveur : ");
+            int port = ConsoleFdB.entreeInt("port : ");
+            Socket soc = new Socket(adrS, port);
+            System.out.println("adr serveur : " + soc.getInetAddress().getHostAddress());
+            System.out.println("port serveur : " + soc.getPort());
+            System.out.println("port local : " + soc.getLocalPort());
+        } catch (IOException ex) {
+            throw new Error(ex);
+        }
+        
+    }
     
     public static void main(String[] args) {
         System.out.println("TODO");
