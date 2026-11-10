@@ -102,7 +102,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>fr.insa.beuvron.cours.multiTache.sockets.direct.ServeurDirect</mainClass>
+                                    <mainClass>fr.insa.beuvron.cours.multiTache.sockets.direct.ServeurChat</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
@@ -122,7 +122,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>fr.insa.beuvron.cours.multiTache.sockets.direct.ClientDirect</mainClass>
+                                    <mainClass>fr.insa.beuvron.cours.multiTache.sockets.direct.ClientChat</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

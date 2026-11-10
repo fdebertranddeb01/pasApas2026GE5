@@ -41,9 +41,6 @@ public class ClientDirect {
             System.out.println("adr serveur : " + soc.getInetAddress().getHostAddress());
             System.out.println("port serveur : " + soc.getPort());
             System.out.println("port local : " + soc.getLocalPort());
-            EcouteServeur es = new EcouteServeur(soc);
-            es.start();
-            System.out.println("ecouteur serveur running");
             try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
                     soc.getOutputStream(), Charset.forName("UTF8")))) {
                 String mess = "";
@@ -57,29 +54,6 @@ public class ClientDirect {
             throw new Error(ex);
         }
 
-    }
-
-    public static class EcouteServeur extends Thread {
-
-        private Socket soc;
-
-        public EcouteServeur(Socket soc) {
-            this.soc = soc;
-        }
-
-        @Override
-        public void run() {
-            try (var in = new BufferedReader(
-                    new InputStreamReader(
-                            this.soc.getInputStream(), Charset.forName("UTF8")))) {
-                String mess;
-                while ((mess = in.readLine()) != null) {
-                    System.out.println("recu : " + mess);
-                }
-            } catch (IOException ex) {
-                throw new Error("problem ecouteur : ", ex);
-            }
-        }
     }
 
     public static void main(String[] args) {
