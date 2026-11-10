@@ -27,12 +27,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  *
@@ -79,6 +75,8 @@ public class ServeurChatAvecReadWriteList {
                 this.resenders.getWriteLock();
                 try {
                     this.resenders.getVraieList().add(wc);
+                    System.out.println("added " + strSocket(soc) + " to resenders");
+                    wc.start();
                 } finally {
                     this.resenders.releaseWriteLock();
                 }
@@ -125,8 +123,9 @@ public class ServeurChatAvecReadWriteList {
 
         public void addMessage(String mess) {
             try {
-                System.out.println("adding mess toSend for socket "+strSocket(getSoc()));
+                System.out.println("adding " + mess + " toSend for socket "+strSocket(getSoc()));
                 this.enAttente.put(mess);
+                System.out.println("added " + mess + " toSend for socket "+strSocket(getSoc()));
             } catch (InterruptedException ex) {
                 throw new Error("pas d'interrupt", ex);
             }
@@ -139,8 +138,9 @@ public class ServeurChatAvecReadWriteList {
                             this.getSoc().getOutputStream(), Charset.forName("UTF8")))) {
                 while (true) {
                     try {
+                        System.out.println("Writer client waiting for message for soc : "+strSocket(this.soc));
                         String mess = this.enAttente.take();
-                        System.out.println("writer for soc "+ strSocket(getSoc()) + " : "+mess);
+                        System.out.println("writer for soc "+ strSocket(getSoc()) + " : sending "+mess);
                         out.println(mess);
                         out.flush();
                     } catch (InterruptedException ex) {
@@ -170,7 +170,7 @@ public class ServeurChatAvecReadWriteList {
                 resenders.getReadLock();
                 try {
                     for (WriterClient wc : resenders.getVraieList()) {
-                        System.out.println("Renvoie chat renvoie a "+strSocket(wc.getSoc()));
+                        System.out.println("Renvoie chat renvoie "+ mess + " a "+strSocket(wc.getSoc()));
                         wc.addMessage(mess);
                     }
                 } finally {

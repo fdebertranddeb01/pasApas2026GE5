@@ -36,8 +36,10 @@ public class ClientChat {
     public static void demarre() {
         try {
             System.out.println("Client chat");
-            String adrS = ConsoleFdB.entreeString("adresse serveur : ");
-            int port = ConsoleFdB.entreeInt("port : ");
+//            String adrS = ConsoleFdB.entreeString("adresse serveur : ");
+//            int port = ConsoleFdB.entreeInt("port : ");
+            String adrS = "10.161.10.9";
+            int port = 50001;
             Socket soc = new Socket(adrS, port);
             System.out.println("adr serveur : " + soc.getInetAddress().getHostAddress());
             System.out.println("port serveur : " + soc.getPort());
