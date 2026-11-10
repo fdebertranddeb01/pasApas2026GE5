@@ -22,9 +22,16 @@ import fr.insa.beuvron.cours.multiTache.sockets.INetAdressUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -33,13 +40,17 @@ import java.nio.charset.Charset;
 public class ServeurDirect {
 
     public static final int PORT = 50001;
-    
+
     private MyBlockingQueue<String> messages;
+
+    // à améliorer avec des read-write lock
+    private List<WriterClient> resenders;
 
     public ServeurDirect() {
         this.messages = new MyBlockingQueue<>(30);
+        this.resenders = Collections.synchronizedList(new ArrayList<>());
     }
-    
+
     public static String strSocket(Socket soc) {
         return soc.getInetAddress().getHostAddress() + ":" + soc.getPort();
     }
@@ -64,7 +75,7 @@ public class ServeurDirect {
             throw new Error(ex);
         }
     }
-    
+
     public void chat() {
         try {
             ServerSocket serv = new ServerSocket(PORT);
@@ -72,6 +83,9 @@ public class ServeurDirect {
             System.out.println("Serveur attends connection");
             System.out.println("adresse : " + adrS.getHostAddress());
             System.out.println("port : " + PORT);
+            RenvoieChat renvoie = new RenvoieChat();
+            renvoie.start();
+            System.out.println("resender running");
             while (true) {
                 Socket soc = serv.accept();
                 System.out.println("connection : ");
@@ -80,14 +94,18 @@ public class ServeurDirect {
                 System.out.println("port local : " + soc.getLocalPort());
                 EcouteurChat cl = this.new EcouteurChat(soc);
                 cl.start();
+                WriterClient wc = new WriterClient(soc);
+                this.resenders.add(wc);
+                wc.start();
             }
         } catch (IOException ex) {
             throw new Error(ex);
-        }             
+        }
     }
 
-    /** cela n'est plus utilisé dans la version chat
-     * ne fonctionne qu'avec l'appel "direct"
+    /**
+     * cela n'est plus utilisé dans la version chat ne fonctionne qu'avec
+     * l'appel "direct"
      */
     public static class EcouteurClient extends Thread {
 
@@ -137,13 +155,63 @@ public class ServeurDirect {
 
         }
     }
-    
+
+    public static class WriterClient extends Thread {
+
+        private Socket soc;
+        BlockingQueue<String> enAttente;
+
+        public WriterClient(Socket soc) {
+            this.soc = soc;
+            this.enAttente = new LinkedBlockingQueue<>(100);
+        }
+
+        public void addMessage(String mess) {
+            try {
+                this.enAttente.put(mess);
+            } catch (InterruptedException ex) {
+                throw new Error("pas d'interrupt", ex);
+            }
+        }
+
+        @Override
+        public void run() {
+            try (var out = new PrintWriter(
+                    new OutputStreamWriter(
+                            this.soc.getOutputStream(), Charset.forName("UTF8")))) {
+                while (true) {
+                    try {
+                        String mess = this.enAttente.take();
+                        out.println(mess);
+                        out.flush();
+                    } catch (InterruptedException ex) {
+                        throw new Error("pas d'interrupt", ex);
+                    }
+
+                }
+            } catch (IOException ex) {
+                throw new Error("probleme écriture sur " + strSocket(soc), ex);
+            }
+        }
+    }
+
     public class RenvoieChat extends Thread {
         
+        @Override
+        public void run() {
+            while(true) {
+                String mess = messages.pollWait();
+                for (WriterClient wc : resenders) {
+                    wc.addMessage(mess);
+                }
+            }
+        }
+
     }
 
     public static void main(String[] args) {
-        direct();
+        ServeurDirect sChat = new ServeurDirect();
+        sChat.chat();
     }
 
 }
