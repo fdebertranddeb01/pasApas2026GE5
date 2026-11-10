@@ -33,6 +33,16 @@ import java.nio.charset.Charset;
 public class ServeurDirect {
 
     public static final int PORT = 50001;
+    
+    private MyBlockingQueue<String> messages;
+
+    public ServeurDirect() {
+        this.messages = new MyBlockingQueue<>(30);
+    }
+    
+    public static String strSocket(Socket soc) {
+        return soc.getInetAddress().getHostAddress() + ":" + soc.getPort();
+    }
 
     public static void direct() {
         try {
@@ -41,11 +51,54 @@ public class ServeurDirect {
             System.out.println("Serveur attends connection");
             System.out.println("adresse : " + adrS.getHostAddress());
             System.out.println("port : " + PORT);
-            Socket soc = serv.accept();
-            System.out.println("connection : ");
-            System.out.println("adr client : " + soc.getInetAddress().getHostAddress());
-            System.out.println("port client : " + soc.getPort());
-            System.out.println("port local : " + soc.getLocalPort());
+            while (true) {
+                Socket soc = serv.accept();
+                System.out.println("connection : ");
+                System.out.println("adr client : " + soc.getInetAddress().getHostAddress());
+                System.out.println("port client : " + soc.getPort());
+                System.out.println("port local : " + soc.getLocalPort());
+                EcouteurClient cl = new EcouteurClient(soc);
+                cl.start();
+            }
+        } catch (IOException ex) {
+            throw new Error(ex);
+        }
+    }
+    
+    public void chat() {
+        try {
+            ServerSocket serv = new ServerSocket(PORT);
+            var adrS = INetAdressUtil.premiereAdresseNonLoopback();
+            System.out.println("Serveur attends connection");
+            System.out.println("adresse : " + adrS.getHostAddress());
+            System.out.println("port : " + PORT);
+            while (true) {
+                Socket soc = serv.accept();
+                System.out.println("connection : ");
+                System.out.println("adr client : " + soc.getInetAddress().getHostAddress());
+                System.out.println("port client : " + soc.getPort());
+                System.out.println("port local : " + soc.getLocalPort());
+                EcouteurChat cl = this.new EcouteurChat(soc);
+                cl.start();
+            }
+        } catch (IOException ex) {
+            throw new Error(ex);
+        }             
+    }
+
+    /** cela n'est plus utilisé dans la version chat
+     * ne fonctionne qu'avec l'appel "direct"
+     */
+    public static class EcouteurClient extends Thread {
+
+        private Socket soc;
+
+        public EcouteurClient(Socket soc) {
+            this.soc = soc;
+        }
+
+        @Override
+        public void run() {
             try (var in = new BufferedReader(
                     new InputStreamReader(
                             soc.getInputStream(), Charset.forName("UTF8")))) {
@@ -53,11 +106,40 @@ public class ServeurDirect {
                 while ((line = in.readLine()) != null) {
                     System.out.println("recu : " + line);
                 }
+            } catch (IOException ex) {
+                throw new Error(ex);
             }
-        } catch (IOException ex) {
-            throw new Error(ex);
+
+        }
+    }
+
+    public class EcouteurChat extends Thread {
+
+        private Socket soc;
+
+        public EcouteurChat(Socket soc) {
+            this.soc = soc;
         }
 
+        @Override
+        public void run() {
+            try (var in = new BufferedReader(
+                    new InputStreamReader(
+                            soc.getInputStream(), Charset.forName("UTF8")))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    System.out.println("recu de " + strSocket(soc) + " : " + line);
+                    messages.offerWait(line);
+                }
+            } catch (IOException ex) {
+                throw new Error(ex);
+            }
+
+        }
+    }
+    
+    public class RenvoieChat extends Thread {
+        
     }
 
     public static void main(String[] args) {
