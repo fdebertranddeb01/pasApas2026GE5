@@ -72,42 +72,7 @@ public class GestionBdD {
             con.setAutoCommit(true);
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     public static void deleteSchema(Connection con) {
         try (PreparedStatement pst = con.prepareStatement(
