@@ -28,7 +28,7 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 
 /**
- *
+ * 
  * @author francois
  */
 public class ClientChat {
