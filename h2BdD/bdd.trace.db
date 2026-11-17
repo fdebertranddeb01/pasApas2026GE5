@@ -2,3 +2,22 @@
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Erreur de syntaxe dans l'instruction SQL "drop [*]constraint fk_poke_element"; attendu "TABLE, INDEX, USER, SEQUENCE, CONSTANT, TRIGGER, MATERIALIZED, VIEW, ROLE, ALIAS, SCHEMA, ALL OBJECTS, DOMAIN, TYPE, AGGREGATE, SYNONYM"
 Syntax error in SQL statement "drop [*]constraint fk_poke_element"; expected "TABLE, INDEX, USER, SEQUENCE, CONSTANT, TRIGGER, MATERIALIZED, VIEW, ROLE, ALIAS, SCHEMA, ALL OBJECTS, DOMAIN, TYPE, AGGREGATE, SYNONYM"; SQL statement:
 drop constraint fk_poke_element [42001-252]
+2026-11-17 12:08:43.653785+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Contrainte "FK_POKE_ELEMENT" non trouvée
+Constraint "FK_POKE_ELEMENT" not found; SQL statement:
+alter table element drop constraint fk_poke_element [90057-252]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.command.ddl.AlterTableDropConstraint.update(AlterTableDropConstraint.java:51)
+	at org.h2.command.ddl.AlterTable.update(AlterTable.java:46)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:139)
+	at org.h2.command.Command.executeUpdate(Command.java:307)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at fr.insa.beuvron.cours.rappelsBdD.GestionBdD.deleteSchema(GestionBdD.java:80)
+	at fr.insa.beuvron.cours.rappelsBdD.GestionBdD.raz(GestionBdD.java:99)
+	at fr.insa.beuvron.cours.rappelsBdD.GestionBdD.menuPrincipal(GestionBdD.java:118)
+	at fr.insa.beuvron.cours.rappelsBdD.GestionBdD.main(GestionBdD.java:148)

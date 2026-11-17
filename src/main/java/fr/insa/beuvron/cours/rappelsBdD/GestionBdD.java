@@ -76,7 +76,7 @@ public class GestionBdD {
     
     public static void deleteSchema(Connection con) {
         try (PreparedStatement pst = con.prepareStatement(
-                "drop constraint fk_poke_element")) {
+                "alter table poke drop constraint fk_poke_element")) {
             pst.executeUpdate();
         } catch (SQLException ex) {
             System.err.println("impossible de supprimer le lien element : "+ex);
